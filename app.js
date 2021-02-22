@@ -13,8 +13,9 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-//session
 
+
+//session
 const store = new MongoDbStore({
   uri: MONGO_URI,
   collection: 'sessions',
@@ -33,15 +34,6 @@ app.use(
 );
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use((req, res, next) => {
-  User.findById('5bab316ce0a7c75f783cb8a8')
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-});
 
 app.use(authRoutes);
 app.use('/admin', adminRoutes);
