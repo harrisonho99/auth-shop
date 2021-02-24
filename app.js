@@ -4,7 +4,7 @@ const MongoDbStore = require('connect-mongodb-session')(session);
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv').config();
+require('dotenv').config();
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -27,6 +27,19 @@ app.use(
     store,
   })
 );
+
+app.use((req, _, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id.toString())
+    .then((user) => {
+      req.user = user;
+      return next();
+    })
+    .catch((err) => console.log(err));
+});
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -46,6 +59,7 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
+//connect db
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -67,5 +81,5 @@ mongoose
     app.listen(3000);
   })
   .catch((err) => {
-    console.log(err);
+    console.error(err);
   });

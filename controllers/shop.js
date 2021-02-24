@@ -2,20 +2,17 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 
 exports.getProducts = (req, res, next) => {
-  console.log('====================================');
-  console.log(req.isLoggin);
-  console.log('====================================');
   Product.find()
     .then((products) => {
       res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
         path: '/products',
-        isAuthenticated: req.session.user,
+        isAuthenticated: req.user,
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
     });
 };
 
@@ -27,10 +24,10 @@ exports.getProduct = (req, res, next) => {
         product: product,
         pageTitle: product.title,
         path: '/products',
-        isAuthenticated: req.session.user,
+        isAuthenticated: req.user,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 };
 
 exports.getIndex = (req, res, next) => {
@@ -40,11 +37,11 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: 'Shop',
         path: '/',
-        isAuthenticated: req.session.user,
+        isAuthenticated: req.user,
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
     });
 };
 
@@ -58,10 +55,10 @@ exports.getCart = (req, res, next) => {
         path: '/cart',
         pageTitle: 'Your Cart',
         products: products,
-        isAuthenticated: req.session.user,
+        isAuthenticated: req.user,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 };
 
 exports.postCart = (req, res, next) => {
@@ -71,7 +68,6 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then((result) => {
-      console.log(result);
       res.redirect('/cart');
     });
 };
@@ -80,10 +76,10 @@ exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
     .removeFromCart(prodId)
-    .then((result) => {
+    .then((_) => {
       res.redirect('/cart');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 };
 
 exports.postOrder = (req, res, next) => {
@@ -109,7 +105,7 @@ exports.postOrder = (req, res, next) => {
     .then(() => {
       res.redirect('/orders');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 };
 
 exports.getOrders = (req, res, next) => {
@@ -119,8 +115,8 @@ exports.getOrders = (req, res, next) => {
         path: '/orders',
         pageTitle: 'Your Orders',
         orders: orders,
-        isAuthenticated: req.session.user,
+        isAuthenticated: req.user,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 };
