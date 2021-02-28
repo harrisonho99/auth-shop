@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const maxAge = require('./helper/maxAge');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -25,6 +26,9 @@ app.use(
     resave: false,
     saveUninitialized: true,
     store,
+    cookie: {
+      maxAge: maxAge({ day: 10 }),
+    },
   })
 );
 
