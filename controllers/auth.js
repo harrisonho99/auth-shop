@@ -1,9 +1,5 @@
 const User = require('../models/user');
 exports.getLogin = (req, res) => {
-  // const isLoggedIn =
-  //   req.get('Cookie')?.trim().split(';').join().split('=')[1] === 'true'
-  //     ? true
-  //     : false;
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
@@ -33,3 +29,11 @@ exports.postLogOut = (req, res) => {
     res.redirect('/');
   });
 };
+exports.getSignIn = (req, res) => {
+  res.render('auth/sign-in', {
+    path: '/sign-up',
+    pageTitle: 'Sign Up',
+    isAuthenticated: req.session.user,
+  });
+};
+exports.postSignUp = (req, res) => {};
