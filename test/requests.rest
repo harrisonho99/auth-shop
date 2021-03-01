@@ -1,0 +1,13 @@
+GET http://localhost:3000/
+
+###
+GET http://localhost:3000/login
+
+###
+GET http://localhost:3000/sign-up
+
+###
+GET http://localhost:3000/admin/add-product
+
+###
+GET http://localhost:3000/admin/products

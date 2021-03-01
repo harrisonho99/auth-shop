@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const bcrypt = require('bcrypt');
+
 exports.getLogin = (req, res) => {
   res.render('auth/login', {
     path: '/login',
@@ -6,20 +8,43 @@ exports.getLogin = (req, res) => {
     isAuthenticated: req.session.user,
   });
 };
-exports.postLogin = (req, res) => {
-  User.findById('602aaba80fd2512b70430fcf')
-    .then((user) => {
-      req.session.user = user;
-      req.session.isLoggIn = true;
-      return req.session.save((err) => {
-        if (err) {
-          console.error(err);
-          return res.redirect('/error');
+exports.postLogin = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+    const user = await User.findOne({ email }).exec();
+    if (user) {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) throw err;
+        if (result == true) {
+          req.session.user = user;
+          req.session.isLoggIn = true;
+          req.session.save();
+          return res.redirect('/');
         }
-        res.redirect('/');
+        res.redirect('/login');
       });
-    })
-    .catch((err) => console.error(err));
+    } else {
+      res.redirect('/login');
+    }
+  } catch (error) {
+    console.error(error);
+    res.redirect('/error');
+  }
+
+  // User.findById('602aaba80fd2512b70430fcf')
+  //   .then((user) => {
+  //     req.session.user = user;
+  //     req.session.isLoggIn = true;
+  //     return req.session.save((err) => {
+  //       if (err) {
+  //         console.error(err);
+  //         return res.redirect('/error');
+  //       }
+  //       res.redirect('/');
+  //     });
+  //   })
+  //   .catch((err) => console.error(err));
 };
 exports.postLogOut = (req, res) => {
   req.session.destroy((err) => {
@@ -29,11 +54,43 @@ exports.postLogOut = (req, res) => {
     res.redirect('/');
   });
 };
-exports.getSignIn = (req, res) => {
-  res.render('auth/sign-in', {
+exports.getSignUp = (req, res) => {
+  res.render('auth/sign-up', {
     path: '/sign-up',
     pageTitle: 'Sign Up',
     isAuthenticated: req.session.user,
   });
 };
-exports.postSignUp = (req, res) => {};
+exports.postSignUp = (req, res) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+    const comfirmPassword = req.body.comfirmPassword;
+    // if (password !== comfirmPassword) {
+    //   return res.redirect('/sign-up');
+    // }
+    // encript pass word and save to DB
+    bcrypt.hash(
+      password,
+      parseInt(process.env.ROUND),
+      (err, hashedPassword) => {
+        if (err) throw err;
+        User.create({
+          email,
+          password: hashedPassword,
+          cart: { items: [] },
+        })
+          .then(() => {
+            res.redirect('/login');
+          })
+          .catch((err) => {
+            console.error(err);
+            res.redirect('/sign-up');
+          });
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.redirect('/error');
+  }
+};

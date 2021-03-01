@@ -11,17 +11,18 @@
   "author": "hoang ho",
   "license": "ISC",
   "devDependencies": {
-    "dotenv": "^8.2.0",
     "nodemon": "^1.18.3"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.18.3",
     "connect-mongodb-session": "^2.4.1",
+    "dotenv": "^8.2.0",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "express-session": "^1.17.1",
     "lodash": "^4.17.20",
     "mongoose": "^5.11.15"
-  }
+  },
+  "type": "commonjs"
 }
