@@ -4,8 +4,12 @@ const express = require('express');
 
 const adminController = require('../controllers/admin');
 
+const authRequest = require('../middlewares/authRequest');
+
 const router = express.Router();
 
+// protect route
+router.use(authRequest);
 // /admin/add-product => GET
 router.get('/add-product', adminController.getAddProduct);
 

@@ -18,9 +18,14 @@ exports.postLogin = async (req, res) => {
         if (err) throw err;
         if (result == true) {
           req.session.user = user;
-          req.session.isLoggIn = true;
-          req.session.save();
-          return res.redirect('/');
+          req.session.isLoggedIn = true;
+          return req.session.save((err) => {
+            if (err) {
+              console.error(err);
+              return res.redirect('/error');
+            }
+            res.redirect('/');
+          });
         }
         res.redirect('/login');
       });
@@ -36,13 +41,13 @@ exports.postLogin = async (req, res) => {
   //   .then((user) => {
   //     req.session.user = user;
   //     req.session.isLoggIn = true;
-  //     return req.session.save((err) => {
-  //       if (err) {
-  //         console.error(err);
-  //         return res.redirect('/error');
-  //       }
-  //       res.redirect('/');
-  //     });
+  // return req.session.save((err) => {
+  //   if (err) {
+  //     console.error(err);
+  //     return res.redirect('/error');
+  //   }
+  //   res.redirect('/');
+  // });
   //   })
   //   .catch((err) => console.error(err));
 };
