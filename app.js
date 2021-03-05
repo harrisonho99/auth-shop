@@ -4,7 +4,9 @@ const MongoDbStore = require('connect-mongodb-session')(session);
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const flash = require('connect-flash');
 require('dotenv').config();
+
 const maxAge = require('./helper/maxAge');
 const csrf = require('csurf');
 const errorController = require('./controllers/error');
@@ -28,6 +30,7 @@ const store = new MongoDbStore({
   uri: process.env.MONGO_URI,
   collection: 'sessions',
 });
+
 app.use(
   session({
     secret: 'my secret',
@@ -39,6 +42,7 @@ app.use(
     },
   })
 );
+app.use(flash());
 app.use(csrfProtection);
 app.use((req, _, next) => {
   if (!req.session.user) {

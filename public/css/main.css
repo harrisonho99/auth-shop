@@ -244,6 +244,28 @@ form {
   color: white;
 }
 
+.inline-link-password {
+  margin-left: 5rem;
+  color: cadetblue;
+  transition: color 0.3s;
+}
+.inline-link-password:hover {
+  color: black;
+}
+.error-message-wrapper {
+  width: 100%;
+  display: flex;
+}
+.error-message-alert {
+  margin: auto;
+  width: fit-content;
+  padding: 8px 1rem;
+  border-radius: 5px;
+  border: 2px solid #d10000;
+  background-color: rgb(255, 94, 94);
+  text-align: center;
+  color: white;
+}
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

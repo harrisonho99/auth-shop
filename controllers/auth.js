@@ -2,9 +2,12 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
 exports.getLogin = (req, res) => {
+  const errorMessage = req.flash().error;
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
+    errorMessage,
   });
 };
 exports.postLogin = async (req, res) => {
@@ -12,9 +15,14 @@ exports.postLogin = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     const user = await User.findOne({ email }).exec();
+    // check logging in by email
     if (user) {
       bcrypt.compare(password, user.password, (err, result) => {
-        if (err) throw err;
+        // check logging in by password
+        if (err) {
+          console.error(err);
+          return res.redirect('/error');
+        }
         if (result == true) {
           req.session.user = user;
           req.session.isLoggedIn = true;
@@ -26,10 +34,12 @@ exports.postLogin = async (req, res) => {
             res.redirect('/');
           });
         }
+        req.flash('error', 'Email or password is not correct!');
         res.redirect('/login');
       });
     } else {
-      res.redirect('/login');
+      req.flash('error', 'Email or password is not correct!');
+      return res.redirect('/login');
     }
   } catch (error) {
     console.error(error);
@@ -59,9 +69,11 @@ exports.postLogOut = (req, res) => {
   });
 };
 exports.getSignUp = (req, res) => {
+  const errorMessage = req.flash().error;
   res.render('auth/sign-up', {
     path: '/sign-up',
     pageTitle: 'Sign Up',
+    errorMessage,
   });
 };
 exports.postSignUp = (req, res) => {
@@ -69,9 +81,10 @@ exports.postSignUp = (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     const comfirmPassword = req.body.comfirmPassword;
-    // if (password !== comfirmPassword) {
-    //   return res.redirect('/sign-up');
-    // }
+    if (password !== comfirmPassword) {
+      req.flash('error', "Your password didn't matched");
+      return res.redirect('/sign-up');
+    }
     // encript pass word and save to DB
     bcrypt.hash(
       password,
@@ -87,8 +100,11 @@ exports.postSignUp = (req, res) => {
             res.redirect('/login');
           })
           .catch((err) => {
+            if (err && err.code === 11000) {
+              req.flash('error', 'This email may be used!');
+              res.redirect('/sign-up');
+            }
             console.error(err);
-            res.redirect('/sign-up');
           });
       }
     );
