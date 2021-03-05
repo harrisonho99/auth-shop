@@ -6,14 +6,22 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const maxAge = require('./helper/maxAge');
-
+const csrf = require('csurf');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
 const app = express();
+
 // template engine
 app.set('view engine', 'ejs');
 app.set('views', 'views');
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
+//csrf protecction
+const csrfProtection = csrf();
 
 //session
 const store = new MongoDbStore({
@@ -31,7 +39,7 @@ app.use(
     },
   })
 );
-
+app.use(csrfProtection);
 app.use((req, _, next) => {
   if (!req.session.user) {
     return next();
@@ -44,14 +52,14 @@ app.use((req, _, next) => {
     .catch((err) => console.log(err));
 });
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
-app.use(bodyParser.json());
-
 // assets
 app.use(express.static(path.join(__dirname, 'public')));
+//
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.user;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 //routes
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');

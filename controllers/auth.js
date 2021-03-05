@@ -5,7 +5,6 @@ exports.getLogin = (req, res) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    isAuthenticated: req.session.user,
   });
 };
 exports.postLogin = async (req, res) => {
@@ -63,7 +62,6 @@ exports.getSignUp = (req, res) => {
   res.render('auth/sign-up', {
     path: '/sign-up',
     pageTitle: 'Sign Up',
-    isAuthenticated: req.session.user,
   });
 };
 exports.postSignUp = (req, res) => {
